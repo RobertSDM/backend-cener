@@ -62,4 +62,7 @@ jobs:
           app-name: 'be-cener'
           slot-name: 'Production'
           package: .
-          
+        
+      - name: 'Init the app'
+        run: |
+          npm run start
