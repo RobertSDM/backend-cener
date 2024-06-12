@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { SERVER_URL } from "./utils";
+import { SERVER_URL } from "./utils/index.js";
 
 const prisma = new PrismaClient();
 const LETTER_SPECTRUM = [
