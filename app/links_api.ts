@@ -8,18 +8,14 @@ import {
     getLinkById,
     saveLink,
 } from "./database_connection.js";
-import { HOST, PORT } from "./utils/index.js";
+import { AUTH_APIS, HOME_URL, HOST, PORT } from "./utils/index.js";
 
 export const app = express();
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 // Hook to handle the authorization
 app.use((req, res, next) => {
-    const ROUTES_TO_MIDDLEWARE = [
-        "/get/links",
-        "/delete",
-        "/create",
-    ];
+    const ROUTES_TO_MIDDLEWARE = ["/get/links", "/delete", "/create"];
 
     // Extrai a URL atual
     const currentURL = req.url;
@@ -32,7 +28,7 @@ app.use((req, res, next) => {
     if (routeMatches) {
         const { Authorization: auth } = req.headers;
 
-        if (auth === process.env.AUTH_APIS) {
+        if (auth === AUTH_APIS) {
             next();
         } else {
             return res.status(401).send({
@@ -44,7 +40,6 @@ app.use((req, res, next) => {
         next();
     }
 });
-
 
 // Hook to handle origin
 app.use((req, res, next) => {
@@ -60,7 +55,7 @@ app.use((req, res, next) => {
     if (routeMatches) {
         next();
     } else {
-        return res.redirect("https://cener.vercel.app/")
+        return res.redirect("https://cener.vercel.app/");
     }
 });
 
@@ -140,11 +135,9 @@ app.get("/r/:id", async (req, res) => {
     const { id } = req.params as { id: string };
 
     const link = await getLinkById(id);
-    return res
-        .status(307)
-        .redirect(link?.original_link ?? process.env.HOME_URL!);
+    return res.status(307).redirect(link?.original_link ?? HOME_URL!);
 });
 
 app.listen(PORT, HOST, () => {
-    console.log(`Server started at ${HOST}:${PORT}`)
-})
+    console.log(`Server started at ${HOST}:${PORT}`);
+});

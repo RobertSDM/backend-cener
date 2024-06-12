@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { SERVER_URL } from "./utils";
 
 const prisma = new PrismaClient();
 const LETTER_SPECTRUM = [
@@ -84,7 +85,7 @@ const saveLink = async (link: string) => {
         const createdLink = prisma.links.create({
             data: {
                 id: generatedId,
-                shortened_link: `${process.env.SERVER_URL}/r/${generatedId}`,
+                shortened_link: `${SERVER_URL}/r/${generatedId}`,
                 original_link: link,
             },
         });
