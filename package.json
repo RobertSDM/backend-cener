@@ -5,8 +5,8 @@
     "main": "main.js",
     "type": "module",
     "scripts": {
-        "start": "node dist/app/links_api.js",
-        "start:tsc": "npx tsc --watch",
+        "start": "node dist/app/main.js",
+        "start:dev": "npx tsc --watch",
         "build": "npx prisma generate && npx tsc --build --verbose"
     },
     "repository": {
