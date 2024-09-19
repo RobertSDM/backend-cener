@@ -5,9 +5,10 @@
     "main": "main.js",
     "type": "module",
     "scripts": {
-        "start": "node dist/app/main.js",
+        "start": "node dist/main.js",
         "start:dev": "npx tsc --watch",
-        "build": "npx prisma generate && npx tsc --build --verbose"
+        "build:prod": "npx prisma generate && npx tsc --build --verbose",
+        "build": "npx tsc -b"
     },
     "repository": {
         "type": "git",
@@ -23,11 +24,11 @@
         "@prisma/client": "^5.7.0",
         "@types/node": "^20.10.4",
         "prisma": "^5.7.0",
+        "@types/cors": "^2.8.17",
+        "@types/express": "^4.17.21",
         "typescript": "^5.3.3"
     },
     "dependencies": {
-        "@types/cors": "^2.8.17",
-        "@types/express": "^4.17.21",
         "body-parser": "^1.20.2",
         "cors": "^2.8.5",
         "dotenv": "^16.4.5",

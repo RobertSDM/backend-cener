@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { SERVER_URL } from "./utils/index.js";
+import { SERVER_URL } from "./utils/globalVariables.js";
 
 const prisma = new PrismaClient();
-const LETTER_SPECTRUM = [
+
+const LOWER_UPPER_CASE = [
     { min: 65, max: 90 },
     { min: 97, max: 122 },
 ];
@@ -12,29 +13,29 @@ let chossen_spectrum;
 const generateSUID = (link: string): string => {
     let sid = "";
 
-    const cuttedLink = link.split("/");
+    const splitedLink = link.split("/");
     const halfLenLink = Math.floor(
-        (cuttedLink[cuttedLink.length - 1].length +
-            cuttedLink[cuttedLink.length - 2].length) /
+        (splitedLink[splitedLink.length - 1].length +
+            splitedLink[splitedLink.length - 2].length) /
             2
     );
 
     sid += Math.floor(Math.random() * (99 - halfLenLink) + halfLenLink);
 
     sid +=
-        cuttedLink[2][
-            Math.floor(Math.random() * cuttedLink[2].length)
+        splitedLink[2][
+            Math.floor(Math.random() * splitedLink[2].length)
         ].toUpperCase();
 
     sid +=
-        cuttedLink[cuttedLink.length - 1][
-            Math.floor(Math.random() * cuttedLink.length)
+        splitedLink[splitedLink.length - 1][
+            Math.floor(Math.random() * splitedLink.length)
         ] +
-        cuttedLink[cuttedLink.length - 1][
-            Math.floor(Math.random() * cuttedLink.length)
+        splitedLink[splitedLink.length - 1][
+            Math.floor(Math.random() * splitedLink.length)
         ];
 
-    chossen_spectrum = LETTER_SPECTRUM[Math.floor(Math.random() * 2)];
+    chossen_spectrum = LOWER_UPPER_CASE[Math.floor(Math.random() * 2)];
 
     sid += String.fromCodePoint(Math.floor(Math.random() * (57 - 48) + 48));
 
@@ -44,7 +45,8 @@ const generateSUID = (link: string): string => {
                 chossen_spectrum.min
         )
     );
-    chossen_spectrum = LETTER_SPECTRUM[Math.floor(Math.random() * 2)];
+
+    chossen_spectrum = LOWER_UPPER_CASE[Math.floor(Math.random() * 2)];
     sid += String.fromCodePoint(
         Math.floor(
             Math.random() * (chossen_spectrum.max - chossen_spectrum.min) +

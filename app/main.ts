@@ -1,6 +1,6 @@
 // Librarys
 import express from "express";
-import bodyParser from "body-parser";
+import cors from "cors";
 // Modules
 import {
     deleteLink,
@@ -8,52 +8,37 @@ import {
     getLinkById,
     saveLink,
 } from "./database_connection.js";
-import { AUTH_APIS, HOME_URL, HOST, PORT } from "./utils/index.js";
 
-export const app = express();
-app.use(bodyParser.json());
+import { HOME_URL, HOST, PORT, VITE_AUTH_TOKEN } from "./utils/globalVariables.js";
+
+const app = express();
+app.use(express.json());
+app.use(
+    cors({
+        origin: "*",
+    })
+);
 
 // Hook to handle the authorization
 app.use((req, res, next) => {
-    const ROUTES_TO_MIDDLEWARE = ["/get/links", "/delete", "/create"];
+    const PRIVATE_ROUTES = ["/get/links", "/delete", "/create"];
 
     // Extrai a URL atual
     const currentURL = req.url;
 
     // Verifica se a URL atual corresponde a algum padrão na lista
-    const routeMatches = ROUTES_TO_MIDDLEWARE.some((route) => {
-        return currentURL.startsWith(route);
+    const isAccessingRoute = PRIVATE_ROUTES.some((route) => {
+        return currentURL.includes(route);
     });
 
-    if (routeMatches) {
-        const { Authorization: auth } = req.headers;
+    if (isAccessingRoute) {
+        const auth = req.headers.authorization;
 
-        if (auth === AUTH_APIS) {
+        if (auth === VITE_AUTH_TOKEN) {
             next();
         } else {
-            return res.status(401).send({
-                Message: "Not authorized",
-                Content: null,
-            });
+            return res.status(401).send();
         }
-    } else {
-        next();
-    }
-});
-
-// Hook to handle origin
-app.use((req, res, next) => {
-    const FREE_ROUTES = ["/r/"];
-
-    const currentURL = req.url;
-
-    // Verifica se a URL atual corresponde a algum padrão na lista
-    const routeMatches = FREE_ROUTES.some((route) => {
-        return currentURL.startsWith(route);
-    });
-
-    if (routeMatches) {
-        next();
     } else {
         return res.redirect("https://cener.vercel.app/");
     }
@@ -61,19 +46,13 @@ app.use((req, res, next) => {
 
 // Endpoint to get all the links with limit
 app.get("/get/links", async (req, res) => {
-    const { limit } = req.query as { limit: string };
+    const limit = req.query.limit;
 
     const links = await getAllLinks(Number(limit));
     if (links) {
-        return res.status(200).send({
-            Message: "Success",
-            Content: links,
-        });
+        return res.status(200).send(links);
     } else {
-        return res.status(404).send({
-            Message: "No links have been found",
-            Content: null,
-        });
+        return res.status(404).send(null);
     }
 });
 
@@ -83,35 +62,27 @@ app.get("/get/links/:id", async (req, res) => {
 
     const link = await getLinkById(id);
     if (link) {
-        return res.status(200).send({
-            Message: "Success",
-            Content: link,
-        });
+        return res.status(200).send(link);
     } else {
-        return res.status(404).send({
-            Message: "No links have been found",
-            Content: null,
-        });
+        return res.status(404).send(null);
     }
 });
 
 // Endpoint to create a link
 app.post("/create", async (req, res) => {
-    const { originalLink } = JSON.parse(req.body as string) as {
+    const { originalLink } = req.body as {
         originalLink: string;
     };
 
+    if (!originalLink) {
+        return res.status(400).send(null);
+    }
+
     const link = await saveLink(originalLink);
     if (link) {
-        return res.status(201).send({
-            Message: "Link created with success",
-            Content: link,
-        });
+        return res.status(201).send(link);
     } else {
-        return res.status(500).send({
-            Message: "An error has ocurred while creating",
-            Content: null,
-        });
+        return res.status(500).send(null);
     }
 });
 
@@ -121,10 +92,7 @@ app.delete("/delete/:id", async (req, res) => {
 
     const link = await deleteLink(id);
     if (!link) {
-        return res.status(404).send({
-            Message: "No content has been found",
-            Content: null,
-        });
+        return res.status(404).send(null);
     } else {
         return res.status(204).send();
     }
@@ -135,7 +103,7 @@ app.get("/r/:id", async (req, res) => {
     const { id } = req.params as { id: string };
 
     const link = await getLinkById(id);
-    return res.status(307).redirect(link?.original_link ?? HOME_URL!);
+    return res.status(307).redirect(link?.original_link ?? HOME_URL);
 });
 
 app.listen(PORT, HOST, () => {

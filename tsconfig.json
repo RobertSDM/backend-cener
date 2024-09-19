@@ -11,10 +11,10 @@
         "allowUnusedLabels": false,
         "noImplicitAny": true,
         "moduleResolution": "Node",
-        "rootDir": "./",
+        "rootDir": "./app",
         "allowSyntheticDefaultImports": true,
         "skipLibCheck": true
     },
-    "include": ["app/**/*", "api/**/*"],
+    "include": ["app/**/*"],
     "exclude": ["node_modules"]
 }
