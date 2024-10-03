@@ -9,7 +9,12 @@ import {
     saveLink,
 } from "./database_connection.js";
 
-import { HOME_URL, HOST, PORT, VITE_AUTH_TOKEN } from "./utils/globalVariables.js";
+import {
+    HOME_URL,
+    HOST,
+    PORT,
+    VITE_AUTH_TOKEN,
+} from "./utils/globalVariables.js";
 
 const app = express();
 app.use(express.json());
@@ -27,11 +32,11 @@ app.use((req, res, next) => {
     const currentURL = req.url;
 
     // Verifica se a URL atual corresponde a algum padrão na lista
-    const isAccessingRoute = PRIVATE_ROUTES.some((route) => {
+    const isAccessingPrivateRoutes = PRIVATE_ROUTES.some((route) => {
         return currentURL.includes(route);
     });
 
-    if (isAccessingRoute) {
+    if (isAccessingPrivateRoutes) {
         const auth = req.headers.authorization;
 
         if (auth === VITE_AUTH_TOKEN) {
@@ -39,9 +44,8 @@ app.use((req, res, next) => {
         } else {
             return res.status(401).send();
         }
-    } else {
-        return res.redirect("https://cener.vercel.app/");
     }
+    next();
 });
 
 // Endpoint to get all the links with limit
